@@ -131,7 +131,7 @@ void CScriptingWindow::Render()
 			const auto exectype = f(script, async);
 
 			if (exectype == ExecType::et_none || !script)
-				break;
+				continue;
 
 			const auto asStr = std::string(script);
 			auto status = false;
@@ -165,7 +165,12 @@ void CScriptingWindow::Render()
 				[[maybe_unused]] const auto _ = state->Abort();
 			}
 
-			if (state->HasFinished()) {
+			if (const auto msg = state->GetErrorMessage()) {
+				Com_Printf("^1Error: %s\n", msg->c_str());
+				state.reset();
+			}
+
+			else if (state->HasFinished()) {
 				state.reset();
 			}
 		}
