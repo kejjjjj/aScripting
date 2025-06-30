@@ -30,7 +30,6 @@ static bool SC_Prepare(Varjus::State& state, Success(Varjus::State::* fn)(Args..
 	if (!CMain::Shared::GetFunctionOrExit("SC_AddObjects")->As<Success, Varjus::State&>()->Call(state))
 		return SC_ThrowError(state);
 #endif
-
 	if (!(state.*fn)(std::forward<Args>(args)...))
 		return SC_ThrowError(state);
 
