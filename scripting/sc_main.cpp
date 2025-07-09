@@ -16,7 +16,7 @@ static bool SC_ThrowError(Varjus::State& state) {
 	return Com_Printf("^1Error: %s\n", err.c_str()), false;
 }
 template<typename ... Args>
-static bool SC_Prepare(Varjus::State& state, Success(Varjus::State::* fn)(Args...), Args&&... args)
+static bool SC_Prepare(Varjus::State& state, Varjus::Success(Varjus::State::* fn)(Args...), Args&&... args)
 {
 
 	if (!state.UseStdLibrary()) {
@@ -24,10 +24,10 @@ static bool SC_Prepare(Varjus::State& state, Success(Varjus::State::* fn)(Args..
 	}
 
 #if(!DEBUG_SUPPORT)
-	if (!CMain::Shared::GetFunctionOrExit("SC_AddFunctions")->As<Success, Varjus::State&>()->Call(state))
+	if (!CMain::Shared::GetFunctionOrExit("SC_AddFunctions")->As<Varjus::Success, Varjus::State&>()->Call(state))
 		return SC_ThrowError(state);
 
-	if (!CMain::Shared::GetFunctionOrExit("SC_AddObjects")->As<Success, Varjus::State&>()->Call(state))
+	if (!CMain::Shared::GetFunctionOrExit("SC_AddObjects")->As<Varjus::Success, Varjus::State&>()->Call(state))
 		return SC_ThrowError(state);
 #endif
 	if (!(state.*fn)(std::forward<Args>(args)...))
@@ -54,7 +54,7 @@ bool SC_ExecuteFile(const std::string& path)
 {
 	Varjus::State state;
 	
-	if (!SC_Prepare(state, &Varjus::State::LoadScriptFromFile, path, e_utf8))
+	if (!SC_Prepare(state, &Varjus::State::LoadScriptFromFile, path, Varjus::e_utf8))
 		return false;
 
 	if (const auto result = state.ExecuteScript()) {
@@ -79,7 +79,7 @@ bool SC_ExecuteAsynchronously(Varjus::State& state, const std::string& script)
 }
 bool SC_ExecuteFileAsynchronously(Varjus::State& state, const std::string& path)
 {
-	if (!SC_Prepare(state, &Varjus::State::LoadScriptFromFile, path, e_utf8))
+	if (!SC_Prepare(state, &Varjus::State::LoadScriptFromFile, path, Varjus::e_utf8))
 		return false;
 
 	std::thread thread(AwaitFunc, std::ref(state));
